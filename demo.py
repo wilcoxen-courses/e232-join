@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 plt.rcParams['figure.dpi'] = 300
 
 #
-#  Set up a dictionary to keep all the FIPS codes in both files as 
+#  Set up a dictionary to keep all the FIPS codes in both files as
 #  strings when the files are being read. Use a dictionary comprehension
 #  for convenience
 #
@@ -20,8 +20,8 @@ fips_vars = ['Region','Division','State','STATEFP']
 fips_cols = {col:str for col in fips_vars}
 
 #
-#  Read the data. OK to use the fips_cols for both since it's not 
-#  a problem for it to contain entries for variables that aren't in 
+#  Read the data. OK to use the fips_cols for both since it's not
+#  a problem for it to contain entries for variables that aren't in
 #  a dataset.
 #
 
@@ -31,7 +31,7 @@ pop_data = pd.read_csv('state_pop.csv',dtype=fips_cols)
 #%%
 
 #
-#  Look at the state codes present in each file. Use set variables 
+#  Look at the state codes present in each file. Use set variables
 #  to get lists of unique entries.
 #
 
@@ -39,7 +39,7 @@ name_states = set( name_data['State'] )
 pop_states = set( pop_data['STATEFP'] )
 
 #  What's in name_data?
-    
+
 print( f"\nRaw state codes in name data ({len(name_data)}):" )
 print( name_data['State'].to_list() )
 
@@ -58,6 +58,17 @@ print( name_states - pop_states )
 
 print( "\nState codes in pop_data not in pop data:" )
 print( pop_states - name_states )
+
+#%%
+#
+#  But wait, there's more: works with sets of tuples, too
+#
+
+tset1 = set( [ (1,2), (2,3), (1,3), (2,3)      ] )
+tset2 = set( [        (2,3), (1,3),       (2,4)] )
+
+print( "\nTuple set 1:", tset1 )
+print( "Difference from set 2:", tset1 - tset2 )
 
 #%%
 #
@@ -90,8 +101,8 @@ print( '\n', merged.loc["8"] )
 #  Aggregate the population by Census division
 #
 
-group_by_div = merged.groupby('Division') 
-div_pop = group_by_div['pop'].sum() 
+group_by_div = merged.groupby('Division')
+div_pop = group_by_div['pop'].sum()
 
 print(div_pop)
 
@@ -115,7 +126,9 @@ merged.to_csv('demo-merged.csv')
 
 #%%
 #
-#  Look over three of the divisions via a loop
+#  Look over three of the divisions via a loop. More convenient
+#  and scalable than writing out separate plot statements for each
+#  figure.
 #
 
 div_info = [
@@ -125,13 +138,13 @@ div_info = [
     ]
 
 for number,name in div_info:
-    
+
     sel = merged.loc[number]
-    
+
     print( f'\n{name} Division:\n' )
     print( sel )
     print( '\nCheck:', round(sel['percent'].sum(),2) )
-    
+
     fig,ax = plt.subplots()
     fig.suptitle(f"Census Division: {name}")
     sel = sel.sort_values('Name',ascending=False)
@@ -139,4 +152,3 @@ for number,name in div_info:
     ax.set_ylabel(None)
     ax.set_xlabel('Population in Millions')
     fig.tight_layout()
-    
